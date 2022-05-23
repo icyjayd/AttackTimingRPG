@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="BehaviorTreeEditor.uss" />
+    <BehaviorTreeView focusable="true" style="flex-grow: 1;" />
+</ui:UXML>
