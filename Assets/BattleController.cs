@@ -111,11 +111,59 @@ public class BattleController : MonoBehaviour
         {
             combatants.Add(e);
         }
+        AdvanceBattleStage();
         //GameObject playerGO = Instantiate()
     }
 
     void AdvanceBattleStage()
     {
+        enemyList.Sort(SortBySpeed);
+        combatants.Sort(SortBySpeed);
+        switch (battleState)
+        {
+            case BattleState.START:
+                battleState = BattleState.PLAYERTURN;
+                Debug.Log("It is now the player's turn");
+                break;
+            case BattleState.PLAYERTURN:
+                playerList.Sort(SortBySpeed);
+                foreach (CombatCharacter p in playerList)
+                {
+                    if (!p.turnOver)
+                    {
+                        currentPlayer = p.GetComponent<PlayerCharacter>();
+                        ActivateButtons();
+                        return;
+                    }
+                }
+                enemyList.Sort(SortBySpeed);
+                currentEnemy = enemyList[0].GetComponent<Enemy>();
+                battleState = BattleState.ENEMYTURN;
+                Debug.Log("It is now the enemy's turn");
+                BeginEnemyTurn();
+                break;
+            case BattleState.ENEMYTURN:
+                enemyList.Sort(SortBySpeed);
+                foreach(CombatCharacter e in enemyList)
+                {
+                    if (!e.turnOver)
+                    {
+                        currentEnemy = e.GetComponent<Enemy>();
+                        //TODO: start enemy turn
+                        BeginEnemyTurn();
+                        return;
+                    }
+                    
+                }
+                playerList.Sort(SortBySpeed);
+                currentPlayer = playerList[0].GetComponent<PlayerCharacter>();
+                battleState = BattleState.PLAYERTURN;
+                Debug.Log("it is now the player's turn");
+                ActivateButtons();
+                break;
+            default:
+                break;
+        }
         
 
 
@@ -146,6 +194,7 @@ public class BattleController : MonoBehaviour
         }
         yield return new WaitForSeconds(delay);
         attacker.turnOver = true;
+        AdvanceBattleStage();
 
     
     }
@@ -157,19 +206,26 @@ public class BattleController : MonoBehaviour
             StartCoroutine(BeginCombatMove(combatMove, attacker, target));
 
         }
-        print(string.Format("attacking {0}", target.GetComponent<CombatCharacter>().name));
+        print(string.Format("attacking {0}", target.name));
     }
     #endregion
 
     #region BattleManagement
-    public void ActivateNextTurn()
+
+    void BeginEnemyTurn()
     {
-        Debug.Log("activating next turn, supposedly");
+        Debug.Log(string.Format("Beginning {0}'s turn!", currentEnemy.name));
+        currentEnemy.turnOver = true;
+        AdvanceBattleStage();
     }
     #endregion
     #region ButtonManagement
     public void DeactivateButtons()
     {
+        foreach(Transform t in attackSubmenu.transform)
+        {
+            Destroy(t.gameObject);
+        }
         attackButton.gameObject.SetActive(false);
         blockButton.gameObject.SetActive(false);
         itemButton.gameObject.SetActive(false);
@@ -178,10 +234,12 @@ public class BattleController : MonoBehaviour
 
     public void ActivateButtons()
     {
+
         attackButton.gameObject.SetActive(true);
         blockButton.gameObject.SetActive(true);
         itemButton.gameObject.SetActive(true);
         specialButton.gameObject.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(attackButton.gameObject);
 
     }
 

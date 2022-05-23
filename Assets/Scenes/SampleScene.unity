@@ -157,6 +157,8 @@ MonoBehaviour:
   unitName: 
   maxHealth: 0
   currentHealth: 0
+  speed: 1
+  turnOver: 0
 --- !u!114 &45554859
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,6 +174,8 @@ MonoBehaviour:
   unitName: Enemy
   maxHealth: 100
   currentHealth: 100
+  speed: 2
+  turnOver: 0
 --- !u!212 &45554860
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -338,6 +342,8 @@ MonoBehaviour:
   unitName: 
   maxHealth: 0
   currentHealth: 0
+  speed: 3
+  turnOver: 0
 --- !u!114 &88032490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,6 +359,8 @@ MonoBehaviour:
   unitName: Enemy
   maxHealth: 100
   currentHealth: 100
+  speed: 4
+  turnOver: 0
 --- !u!1 &102299590
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,6 +686,8 @@ MonoBehaviour:
   unitName: 
   maxHealth: 0
   currentHealth: 0
+  speed: 2
+  turnOver: 0
 --- !u!114 &381813670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,6 +703,8 @@ MonoBehaviour:
   unitName: Enemy
   maxHealth: 100
   currentHealth: 100
+  speed: 3
+  turnOver: 0
 --- !u!212 &381813671
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1220,6 +1232,8 @@ MonoBehaviour:
   unitName: 
   maxHealth: 0
   currentHealth: 0
+  speed: 100
+  turnOver: 0
   currentAttack: {fileID: 654217744}
 --- !u!1 &654217743
 GameObject:
@@ -3769,7 +3783,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de6926f2467790947a068bc684e93269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 5
+  duration: 1
   activateImmediate: []
   activateFinished:
   - {fileID: 102299591}
@@ -3943,6 +3957,8 @@ MonoBehaviour:
   unitName: 
   maxHealth: 0
   currentHealth: 0
+  speed: 0
+  turnOver: 0
 --- !u!114 &2145036722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3958,6 +3974,8 @@ MonoBehaviour:
   unitName: Enemy
   maxHealth: 100
   currentHealth: 100
+  speed: 1
+  turnOver: 0
 --- !u!212 &2145036723
 SpriteRenderer:
   m_ObjectHideFlags: 0

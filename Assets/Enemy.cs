@@ -8,7 +8,7 @@ public class Enemy : CombatCharacter
     // Start is called before the first frame update
     void Start()
     {
-        BattleController.Instance.RegisterEnemy(GetComponent<CombatCharacter>());
+        BattleController.Instance.RegisterEnemy(this);
     }
 
 }
