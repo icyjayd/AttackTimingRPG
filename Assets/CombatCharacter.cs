@@ -13,10 +13,13 @@ public class CombatCharacter : MonoBehaviour
     public int speed;
 
     public bool turnOver = false;
+    public bool isPlayer;
+    public Vector3 startingPosition;
     // Start is called before the first frame update
-    void Start()
+    public virtual void Start()
     {
-        
+        startingPosition = transform.position;
+        //Debug.Log(this.name + "'s starting position: " + startingPosition.ToString());
     }
 
     // Update is called once per frame

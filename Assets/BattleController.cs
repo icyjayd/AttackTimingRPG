@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEngine.InputSystem;
-
+using TMPro;
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST}
 public enum MenuType { ATTACK, BLOCK, ITEM, SPECIAL}
 public class BattleController : MonoBehaviour
@@ -13,6 +14,7 @@ public class BattleController : MonoBehaviour
     public PlayerCharacter currentPlayer;
     public List<CombatCharacter> playerList;
     public Enemy currentEnemy;
+    public CombatCharacter selectedTarget;
     public List<CombatCharacter> enemyList;
     public List<CombatCharacter> combatants;
     BattleState battleState;
@@ -22,17 +24,23 @@ public class BattleController : MonoBehaviour
     public Button itemButton;
     public Button specialButton;
 
+    public Button buttonPrefab;
+    public Button targetSelector;
+    public int targetSelectorIndex = 0;
+    TextMeshProUGUI targetSelectorText;
+    bool targetSelectorMoved = false;
     public GameObject attackSubmenu;
     CombatMove combatMove;
     public CombatMove basicAttack;
-    
+    Vector2 _menuMovement;
+    UnityAction selectedAction;
     //public GameObject blockSubmenu;
     //public GameObject itemSubmenu;
     //public GameObject specialSubmenu;
     EventSystem m_EventSystem;
 
-    public Button buttonPrefab;
-    PlayerInputActions controls;
+
+    public static PlayerInputActions controls;
 
 
     private static BattleController _instance = null;
@@ -67,6 +75,7 @@ public class BattleController : MonoBehaviour
     {
         controls = new PlayerInputActions();
         controls.Player.Fire.performed += ctx => Fire();
+        
         if (_instance != null && _instance != this)
         {
             Destroy(this.gameObject);
@@ -76,20 +85,34 @@ public class BattleController : MonoBehaviour
             _instance = this;
         }
         enemyList = new List<CombatCharacter>();
-        
+        targetSelectorText = targetSelector.GetComponentInChildren<TextMeshProUGUI>();
         //fireAction.performed += Fire;
-    }
-    static int SortBySpeed(CombatCharacter p1, CombatCharacter p2)
-    {
-        return p1.speed.CompareTo(p2.speed);
     }
     private void Start()
     {
         battleState = BattleState.START;
         SetUpBattle();
     }
+    static int SortBySpeed(CombatCharacter p1, CombatCharacter p2)
+    {
+        return p1.speed.CompareTo(p2.speed);
+    }
+    
+    static int SortByPosition(CombatCharacter p1, CombatCharacter p2)
+    {
+        return p1.transform.position.x.CompareTo(p2.transform.position.x);
+    }
+
     private void Update()
     {
+
+        if (targetSelector.isActiveAndEnabled)
+        {
+            HandleTargetSelectorIndex();
+            selectedTarget = enemyList[targetSelectorIndex];
+            SelectAttackAction();
+
+        }
         //if(combatMove != null)
         //{
         //    while (!combatMove.isDone)
@@ -115,6 +138,26 @@ public class BattleController : MonoBehaviour
         //GameObject playerGO = Instantiate()
     }
 
+    void HandleTargetSelectorIndex()
+    {
+        _menuMovement = controls.Player.Move.ReadValue<Vector2>();
+        if (_menuMovement.x > 0.2f && !targetSelectorMoved)
+        {
+            targetSelectorIndex = Mathf.Clamp(targetSelectorIndex + 1, 0, enemyList.Count - 1);
+            targetSelectorMoved = true;
+        }
+        else if (_menuMovement.x < -0.2f && !targetSelectorMoved)
+        {
+            targetSelectorIndex = Mathf.Clamp(targetSelectorIndex - 1, 0, enemyList.Count - 1);
+            targetSelectorMoved = true;
+        }
+        else if (_menuMovement.x == 0 && targetSelectorMoved == true)
+        {
+            targetSelectorMoved = false;
+        }
+        targetSelector.onClick.RemoveListener(selectedAction);
+
+    }
     void AdvanceBattleStage()
     {
         enemyList.Sort(SortBySpeed);
@@ -132,6 +175,7 @@ public class BattleController : MonoBehaviour
                     if (!p.turnOver)
                     {
                         currentPlayer = p.GetComponent<PlayerCharacter>();
+                        EnableButtons();
                         ActivateButtons();
                         return;
                     }
@@ -141,6 +185,11 @@ public class BattleController : MonoBehaviour
                 battleState = BattleState.ENEMYTURN;
                 Debug.Log("It is now the enemy's turn");
                 BeginEnemyTurn();
+                
+                foreach(CombatCharacter p in playerList)
+                {
+                    p.turnOver = false;
+                }
                 break;
             case BattleState.ENEMYTURN:
                 enemyList.Sort(SortBySpeed);
@@ -159,7 +208,12 @@ public class BattleController : MonoBehaviour
                 currentPlayer = playerList[0].GetComponent<PlayerCharacter>();
                 battleState = BattleState.PLAYERTURN;
                 Debug.Log("it is now the player's turn");
+                EnableButtons();
                 ActivateButtons();
+                foreach(CombatCharacter e in enemyList)
+                {
+                    e.turnOver = false;
+                }
                 break;
             default:
                 break;
@@ -215,23 +269,40 @@ public class BattleController : MonoBehaviour
     void BeginEnemyTurn()
     {
         Debug.Log(string.Format("Beginning {0}'s turn!", currentEnemy.name));
-        currentEnemy.turnOver = true;
-        AdvanceBattleStage();
+        int moveChoice = Random.Range(0, currentEnemy.moveList.Count);
+        CombatMove c = currentEnemy.moveList[moveChoice];
+        int playerChoice = Random.Range(0, playerList.Count);
+        CombatCharacter target = playerList[playerChoice];
+        StartCoroutine(BeginCombatMove(c, currentEnemy, target));
+
+        //currentEnemy.turnOver = true;
+        //AdvanceBattleStage();
     }
     #endregion
     #region ButtonManagement
+    public void DisableButtons()
+    {
+        attackButton.enabled = false;
+        blockButton.enabled = false;
+        itemButton.enabled = false;
+        specialButton.enabled = false;
+    }
+    public void EnableButtons()
+    {
+        attackButton.enabled = true;
+        blockButton.enabled = true;
+        itemButton.enabled = true;
+        specialButton.enabled = true;
+    }
     public void DeactivateButtons()
     {
-        foreach(Transform t in attackSubmenu.transform)
-        {
-            Destroy(t.gameObject);
-        }
+        targetSelector.gameObject.SetActive(false);
         attackButton.gameObject.SetActive(false);
         blockButton.gameObject.SetActive(false);
         itemButton.gameObject.SetActive(false);
         specialButton.gameObject.SetActive(false);
     }
-
+    
     public void ActivateButtons()
     {
 
@@ -267,19 +338,36 @@ public class BattleController : MonoBehaviour
         }
 
     }
+    void OnAttackButtonPress()
+    {
+        targetSelector.gameObject.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(targetSelector.gameObject);
+        enemyList.Sort(SortByPosition);
+        selectedTarget = enemyList[0];
+        //PopulateSubmenu(MenuType.ATTACK);
+        //m_EventSystem.SetSelectedGameObject(attackSubmenu.GetComponentInChildren<Button>().gameObject);
+        print("Attack button was pressed!");
+        targetSelector.onClick.AddListener(() => DeactivateButtons());
+        SelectAttackAction();
+        DisableButtons();
+    }
+
+    void SelectAttackAction()
+    {
+        selectedAction = new UnityAction(() => Attack(currentPlayer, selectedTarget, currentPlayer.currentAttack));
+        targetSelectorText.text = selectedTarget.name;
+        targetSelector.onClick.AddListener(selectedAction);
+
+    }
     #endregion
     public void Fire()///InputAction.CallbackContext context)
     {
         Debug.Log("Fire!");
     }
+
+
     #region OnButtonPress
-    public void OnAttackButtonPress()
-    {
-        PopulateSubmenu(MenuType.ATTACK);
-        m_EventSystem.SetSelectedGameObject(attackSubmenu.GetComponentInChildren<Button>().gameObject);
-        print("Attack button was pressed!");
- 
-    }
+
     
     public void OnItemButtonPressed()
     {

@@ -7,8 +7,9 @@ public class PlayerCharacter : CombatCharacter
  
     public CombatMove currentAttack;
 
-    public void Start()
+    public override void Start()
     {
         BattleController.Instance.RegisterPlayer(this);
+        base.Start();
     }
 }

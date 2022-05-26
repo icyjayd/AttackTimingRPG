@@ -1,12 +1,14 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class CombatMove : MonoBehaviour
 {
 	public static int FramesSinceLastButtonOnePress = 100;
 	public static int FramesSinceLastButtonTwoPress = 100;
-
+	public static bool ButtonPressed = false;
+	public static int ButtonTiming;
 	public new string name;
 	[Multiline]
 	public string description = "";
@@ -38,23 +40,25 @@ public class CombatMove : MonoBehaviour
 	public void UpdateFrame()
 	{
 		//if (CombatManager.Singleton.keyInput.GetButton(Keybindings.EButton.Ok, Keybindings.EButtonState.Down))
-		//{
-		//	FramesSinceLastButtonOnePress = 0;
-		//}
-		//else
-		//{
-		//	FramesSinceLastButtonOnePress++;
-		//}
-		//if (CombatManager.Singleton.keyInput.GetButton(Keybindings.EButton.Cancel, Keybindings.EButtonState.Down))
-		//{
-		//	FramesSinceLastButtonTwoPress = 0;
-		//}
-		//else
-		//{
-		//	FramesSinceLastButtonTwoPress++;
-		//}
+		if (Keyboard.current.spaceKey.wasPressedThisFrame && !ButtonPressed)
+        {
+            FramesSinceLastButtonOnePress = 0;
+			ButtonPressed = true;
+        }
+        else
+        {
+            FramesSinceLastButtonOnePress++;
+        }
+        //if (CombatManager.Singleton.keyInput.GetButton(Keybindings.EButton.Cancel, Keybindings.EButtonState.Down))
+        //{
+        //	FramesSinceLastButtonTwoPress = 0;
+        //}
+        //else
+        //{
+        //	FramesSinceLastButtonTwoPress++;
+        //}
 
-		for (int i = 0; i < activeNodes.Count; i++)
+        for (int i = 0; i < activeNodes.Count; i++)
 		{
 			activeNodes[i].UpdateFrame();
 		}

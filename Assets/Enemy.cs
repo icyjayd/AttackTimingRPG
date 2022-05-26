@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class Enemy : CombatCharacter
 {
-    List<CombatMove> moveList = new List<CombatMove>();
+    public List<CombatMove> moveList = new List<CombatMove>();
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
         BattleController.Instance.RegisterEnemy(this);
+        base.Start();
     }
 
 }

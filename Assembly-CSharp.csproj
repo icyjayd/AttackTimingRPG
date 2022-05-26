@@ -56,12 +56,14 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio Tools for Unity\16.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Moves\MoveNode_MoveInFrontOfTarget.cs" />
     <Compile Include="Assets\KillTheMouse.cs" />
     <Compile Include="Assets\Ubuntunux_BattleZone\Misc\PreviewCharacter.cs" />
     <Compile Include="Assets\CombatCharacter.cs" />
     <Compile Include="Assets\PlayerInputActions.cs" />
     <Compile Include="Assets\DebugButton.cs" />
     <Compile Include="Assets\Ubuntunux_BattleZone\Misc\PreviewCharacters.cs" />
+    <Compile Include="Assets\Moves\MoveNode_PlayerAttack.cs" />
     <Compile Include="Assets\BehaviorTreeRunner.cs" />
     <Compile Include="Assets\WaitNode.cs" />
     <Compile Include="Assets\CombatMove.cs" />
@@ -70,7 +72,7 @@
     <Compile Include="Assets\Enemy.cs" />
     <Compile Include="Assets\CombatManager.cs" />
     <Compile Include="Assets\PlayerCharacter.cs" />
-    <Compile Include="Assets\CombatMoveNode.cs" />
+    <Compile Include="Assets\Moves\CombatMoveNode.cs" />
     <Compile Include="Assets\DecoratorNode.cs" />
     <Compile Include="Assets\BehaviorTree.cs" />
     <Compile Include="Assets\Node.cs" />
@@ -81,6 +83,7 @@
     <Compile Include="Assets\ActionNode.cs" />
     <Compile Include="Assets\BattleController.cs" />
     <Compile Include="Assets\HideLockCursor.cs" />
+    <Compile Include="Assets\MoveNode_MovePlayerBackToPosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
